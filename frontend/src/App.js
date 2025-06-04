@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from 'react';
 import Plot from "react-plotly.js";
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+
 function App() {
   const [data, setData] = useState(null);
   const [func, setFunc] = useState("sin");
@@ -11,7 +13,7 @@ function App() {
   const [custom_Func, setCustom] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/fft?f=${func}&start=${parseFloat(start)}&stop=${parseFloat(stop)}&points=${parseInt(num_points)}&custom=${encodeURIComponent(custom_Func)}`)
+    axios.get(`${BACKEND_URL}/fft?f=${func}&start=${parseFloat(start)}&stop=${parseFloat(stop)}&points=${parseInt(num_points)}&custom=${encodeURIComponent(custom_Func)}`)
       .then((res) => setData(res.data))
       .catch(err => console.error(err));
   }, [func, start, stop, num_points, custom_Func]);

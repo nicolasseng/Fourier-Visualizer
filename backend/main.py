@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 
 import jax.numpy as jnp
 import numpy as np
@@ -10,11 +10,16 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def read_root() -> dict[str, str]:
+    return {"message": "Backend is healthy!"}
 
 
 @app.get("/fft")
@@ -24,7 +29,7 @@ def compute_fft(
     stop: float,
     points: int,
     custom: str = "",
-):
+) -> dict[str, Any] | dict[str, str]:
     if start >= stop:
         stop = start + 1
     x = jnp.linspace(start, stop, points)
