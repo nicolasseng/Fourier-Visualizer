@@ -1,8 +1,10 @@
-import jax
+from typing import Literal
+
 import jax.numpy as jnp
-import matplotlib.pyplot as plt
+import numpy as np
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sympy import Symbol, lambdify, sympify
 
 app = FastAPI()
 
@@ -16,7 +18,15 @@ app.add_middleware(
 
 
 @app.get("/fft")
-def compute_fft(f: str, start: float, stop: float, points: int):
+def compute_fft(
+    f: Literal["sin", "cos", "square", "custom"],
+    start: float,
+    stop: float,
+    points: int,
+    custom: str = "",
+):
+    if start >= stop:
+        stop = start + 1
     x = jnp.linspace(start, stop, points)
     if f == "sin":
         y = jnp.sin(x)
@@ -24,6 +34,16 @@ def compute_fft(f: str, start: float, stop: float, points: int):
         y = jnp.cos(x)
     elif f == "square":
         y = jnp.sign(jnp.sin(x))
+    elif f == "custom":
+        try:
+            x_sym = Symbol("x")
+            expr = sympify(custom)
+            f_np = lambdify(x_sym, expr, "numpy")
+            f_vals = f_np(np.array(x))
+            f_vals = np.nan_to_num(f_vals, nan=0.0, posinf=0.0, neginf=0.0)
+            y = jnp.array(f_vals)
+        except Exception as e:
+            return {"Error": f"Invalid function: {e}"}
     else:
         return {"Error": "Unknown Function"}
 
