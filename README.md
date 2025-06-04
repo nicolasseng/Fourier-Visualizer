@@ -69,3 +69,61 @@ You'll need Docker and Docker Compose installed on your system:
     You should now see the Fourier Visualizer application.
 
 ---
+
+## Project Structure
+
+```
+fourier-visualizer/
+├── backend/                  # Backend folder
+│   ├── main.py               # File for FFT calculations
+│   ├── requirements.txt      # python dependencies
+│   └── Dockerfile            # Dockerfile for backend
+├── frontend/                 # Frontend folder
+│   ├── public/               # irrelevant
+│   ├── src/                  # Source for react app
+│   │   ├── App.js            # Frontend (Communication with backend)
+│   │   └── index.js          # Entry point
+│   ├── package.json          # Frontend dependencies
+│   ├── Dockerfile            # Dockerfile for frontend
+│   └── .env                  
+└── docker-compose.yml        # Docker compose file to connect frontend with backend
+```
+
+---
+
+## Configuration
+
+### Backend
+
+The backend is set up to run on **port `8000`** inside its Docker container. This port is then mapped to port `8000` on your host machine via `docker-compose.yml`.
+
+### Frontend
+
+The frontend is a React application served on **port `3000`** within its container, which is also mapped to port `3000` on your host.
+
+**API Endpoint:**
+
+The frontend talks to the backend using the **environment variable `REACT_APP_BACKEND_URL`**. This variable is set in `docker-compose.yml` to `http://localhost:8000` to enable seamless communication from your host's browser to the Docker containers.
+
+```yaml
+# In docker-compose.yml, for the frontend service:
+environment:
+  - REACT_APP_BACKEND_URL=http://localhost:8000
+```
+And in your `frontend/src/App.js`:
+
+```javascript
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+// ...
+axios.get(`${BACKEND_URL}/fft?...`);
+```
+This setup ensures that when the frontend code runs in your browser (on your host machine), it correctly calls `http://localhost:8000`, which Docker then routes to your backend container.
+
+### Stopping the Application
+
+To stop the running containers and remove the created Docker network:
+```bash
+docker-compose down
+```
+
+---
