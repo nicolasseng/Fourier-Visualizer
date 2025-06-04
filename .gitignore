@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS
+.DS_Store
+.vscode/ # Oder andere Editor-spezifische Ordner, falls du sie nicht teilen möchtest
+*.swp    # Vim-Swap-Dateien
+*~       # Temporäre Dateien
+
+# Virtual
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+*.db
